@@ -103,7 +103,7 @@ sub _compare_attrs {
   }
   else {
     $new_attr->{from} = $new_from;
-    return $new_from;
+    return $new_attr;
   }
 }
 
