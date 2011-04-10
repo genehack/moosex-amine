@@ -151,7 +151,7 @@ sub examine {
     $self->dissect_role( $meta );
   }
   else {
-    foreach my $class ( $meta->linearized_isa ) {
+    foreach my $class ( reverse $meta->linearized_isa ) {
       # FIXME should be a config option
       next if $class =~ /^Moose/;
       $self->dissect_class( $class );
