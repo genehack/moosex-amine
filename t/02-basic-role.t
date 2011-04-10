@@ -12,16 +12,18 @@ isa_ok( $mex->metaobj , 'Moose::Meta::Role' );
 
 my $expected_data_structure = {
   attrs => {
-    simple_attribute => {
-      accessor => 'simple_attribute',
+    role_attribute => {
+      accessor => 'role_attribute',
       from     => 'Test::Basic::Role',
       meta     => {
-        constraint => 'Str' ,
+        constraint    => 'Str' ,
+        is_required   => 1 ,
+        documentation => 'required string' ,
       } ,
     } ,
   },
   methods => {
-    simple_method => {
+    role_method => {
       from => 'Test::Basic::Role' ,
     } ,
   } ,

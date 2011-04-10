@@ -1,5 +1,6 @@
 package Test::Basic::Role;
 use Moose::Role;
-has 'simple_attribute' => ( is => 'rw' , isa => 'Str' );
-sub simple_method  { return 'simple' }
+has 'role_attribute' => ( is => 'rw' , isa => 'Str' , required => 1 ,
+                            documentation => 'required string' );
+sub role_method  { return 'role' }
 1;
