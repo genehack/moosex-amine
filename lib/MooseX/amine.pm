@@ -10,6 +10,36 @@ use Modern::Perl;
 use Test::Deep::NoTest qw/eq_deeply/;
 use Try::Tiny;
 
+has 'include_accessors_in_method_list' => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
+);
+
+has 'include_moose_in_isa' => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
+);
+
+has 'include_private_attributes' =>  => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
+);
+
+has 'include_private_methods' =>  => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
+);
+
+has 'include_standard_methods' => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
+);
+
 has 'metaobj' => (
   is      => 'ro' ,
   isa     => 'Object' ,
@@ -73,18 +103,19 @@ sub BUILDARGS {
 sub dissect_attribute {
   my( $self , $meta , $attribute_name ) = @_;
 
+  if ( $attribute_name =~ /^_/ ) {
+    return unless $self->include_private_attributes;
+  }
+
   my $meta_attr = $meta->get_attribute( $attribute_name );
 
   my $return;
   given ( ref $meta_attr ) {
-    when( 'Moose::Meta::Attribute' ) {
-      $return = $meta_attr->associated_class->name;
-    }
     when( 'Moose::Meta::Role::Attribute' ) {
       $return = $meta_attr->original_role->name;
       $meta_attr = $meta_attr->attribute_for_class();
     }
-    default { die "can't handle $_" }
+    default { $return = $meta_attr->associated_class->name }
   }
 
   my $extracted_attribute = $self->extract_attribute_metainfo( $meta_attr );
@@ -121,15 +152,22 @@ sub dissect_class {
 sub dissect_method {
   my( $self , $meta , $method_name ) = @_;
 
+  if ( $method_name =~ /^_/ ) {
+    return unless $self->include_private_methods;
+  }
+
+
   my $meta_method = $meta->get_method( $method_name );
   my $src = $meta_method->original_package_name;
 
-  ### FIXME this should also be a config option, i guess...
-  return if $self->check_exclusion( $method_name );
+  unless ( $self->include_accessors_in_method_list ) {
+    return if $self->check_exclusion( $method_name );
+  }
 
-  ### FIXME this should be controlled by a flag too
-  my @stock = qw/ DESTROY meta new /;
-  return if $method_name ~~ @stock;
+  unless ( $self->include_standard_methods ) {
+    my @STOCK = qw/ DESTROY meta new /;
+    return if $method_name ~~ @STOCK;
+  }
 
   my $extracted_method =  $self->extract_method_metainfo( $meta_method );
   $self->store_method( $method_name => $extracted_method );
@@ -152,8 +190,7 @@ sub examine {
   }
   else {
     foreach my $class ( reverse $meta->linearized_isa ) {
-      # FIXME should be a config option
-      next if $class =~ /^Moose/;
+      if ( $class =~ /^Moose::/) { next unless $self->include_moose_in_isa }
       $self->dissect_class( $class );
     }
   }
@@ -226,6 +263,6 @@ sub _convert_to_hashref_if_needed {
   return \%hash;
 }
 
-__PACKAGE__->meta->make_immutable;
+#__PACKAGE__->meta->make_immutable;
 1;
 

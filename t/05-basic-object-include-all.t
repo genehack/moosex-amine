@@ -1,0 +1,55 @@
+#! perl
+
+use Test::More;
+
+use MooseX::amine;
+use lib './t/lib';
+
+my $mex = MooseX::amine->new({
+  module                           => 'Test::Basic::Object',
+  include_accessors_in_method_list => 1 ,
+  include_moose_in_isa             => 1 ,
+  include_private_attributes       => 1 ,
+  include_private_methods          => 1 ,
+  include_standard_methods         => 1 ,
+});
+
+isa_ok( $mex , 'MooseX::amine' );
+isa_ok( $mex->metaobj , 'Moose::Meta::Class' );
+
+my $expected_data_structure = {
+  attrs => {
+    simple_attribute => {
+      accessor => 'simple_attribute',
+      from     => 'Test::Basic::Object',
+      meta     => {
+        constraint => 'Str' ,
+      } ,
+    } ,
+    _private_attribute => {
+      reader => '_private_attribute' ,
+      from   => 'Test::Basic::Object' ,
+      meta   => {
+        constraint => 'Int' ,
+      } ,
+    } ,
+  },
+  methods => {
+    _private_attribute => { from => 'Test::Basic::Object' } ,
+    _private_method    => { from => 'Test::Basic::Object' } ,
+    simple_attribute   => { from => 'Test::Basic::Object' },
+    simple_method      => { from => 'Test::Basic::Object' } ,
+    BUILDALL           => { from => 'Moose::Object' },
+    BUILDARGS          => { from => 'Moose::Object' },
+    DEMOLISHALL        => { from => 'Moose::Object' },
+    DESTROY            => { from => 'Test::Basic::Object' },
+    DOES               => { from => 'Moose::Object' },
+    does               => { from => 'Moose::Object' },
+    dump               => { from => 'Moose::Object' },
+    meta               => { from => 'Test::Basic::Object' },
+    new                => { from => 'Test::Basic::Object' },
+  } ,
+};
+is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine()' );
+
+done_testing();
