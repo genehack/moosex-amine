@@ -1,0 +1,56 @@
+#! /opt/perl/bin/perl
+
+use List::Util qw/ max /;
+use Modern::Perl;
+use MooseX::amine;
+
+# set up colored output if we page thru less
+# also exit pager immediately if <1 page of output
+$ENV{LESS} = 'RF';
+
+# don't catch any errors here; if this fails we just output stuff like
+# normal and nobody is the wiser.
+eval 'use IO::Page';
+
+my $module = shift
+  or die "Need a module to examine!";
+
+my $mex = MooseX::amine->new( $module );
+
+my $data = $mex->examine;
+
+my $attribute_name_length = max_length( keys %{ $data->{attrs} });
+my $attribute_from_length = max_length( map { $data->{attrs}{$_}{from} } keys %{ $data->{attrs} } );
+my $attribute_isa_length  = max_length( map { $data->{attrs}{$_}{meta}{constraint} } keys %{ $data->{attrs} });
+
+my $attribute_fstring = "%-${attribute_name_length}s  %2s   %-${attribute_isa_length}s  %-${attribute_from_length}s\n";
+
+say "** ATTRIBUTES";
+
+printf $attribute_fstring , 'NAME' , 'IS' , 'ISA' , 'FROM';
+printf $attribute_fstring , '-' x $attribute_name_length , '--' ,
+  '-' x $attribute_isa_length , '-' x $attribute_from_length;
+
+foreach my $attribute ( sort keys %{ $data->{attrs} }) {
+  my $rw = ( $data->{attrs}{$attribute}{writer} or $data->{attrs}{$attribute}{accessor} )
+    ? 'rw' : 'ro';
+
+  printf $attribute_fstring , $attribute , $rw ,
+    $data->{attrs}{$attribute}{meta}{constraint} , $data->{attrs}{$attribute}{from};
+}
+
+my $method_name_length = max_length( keys %{ $data->{methods} } );
+my $method_from_length = max_length( values %{ $data->{methods} } );
+my $method_fstring = "%-${method_name_length}s  %-${method_from_length}s\n";
+
+say "\n** METHODS";
+printf $method_fstring , 'NAME' , 'FROM';
+printf $method_fstring , '-' x $method_name_length , '-' x $method_from_length;
+foreach my $method( sort keys %{ $data->{methods} } ) {
+  printf $method_fstring , $method , $data->{methods}{$method}{from};
+}
+
+sub max_length {
+  my @list = map { length $_ } @_;
+  return max @list;
+}
