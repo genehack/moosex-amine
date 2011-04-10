@@ -1,0 +1,53 @@
+<% USE Dumper %>
+<div style="padding: 10px">
+<% IF no_mex AND message %>
+<p><% message %></p>
+<% ELSIF no_mex %>
+<p>Select a file on the right</p>
+<% ELSE %>
+
+<h1><% name %></h1>
+
+<table border=1 cellpadding=5>
+  <caption>Attributes</caption>
+  <tr><td width="2px">&nbsp;</td><th>Name</th><th>Is</th><th>Isa</th><th>From</th></tr>
+  <% FOREACH attr IN mex.attrs.keys.sort %>
+  <tr>
+    <td><a href="#" onClick="$('#<% attr %>_meta_row').toggle();return false">X</a></td>
+    <td>
+      <% attr %>
+    </td>
+    <td><% IF mex.attrs.$attr.writer OR mex.attrs.$attr.accessor %>rw<% ELSE %>ro<% END %></td>
+    <td><% mex.attrs.$attr.meta.constraint %></td>
+    <td><a href="<% request.uri_base %>/_show/name/<% mex.attrs.$attr.from %>"><% mex.attrs.$attr.from %></a></td>
+  </tr>
+  <tr id="<% attr %>_meta_row" style="display:none">
+    <td colspan="5">
+      <pre><code class="language-perl"><% Dumper.dump( mex.attrs.$attr ) %></code></pre>
+    </td>
+  </tr>
+  <% END %>
+</table>
+
+<table border=1 cellpadding=5 width="90%">
+  <caption>Methods</caption>
+  <tr><td width="2px">&nbsp;</td><th>Name</th><th>From</th></tr>
+  <% FOREACH method IN mex.methods.keys.sort %>
+  <tr>
+    <td><% IF mex.methods.$method.code %><a href="#" onClick="$('#<% method %>_code_row').toggle();return false">X</a> <% END %></td>
+    <td><% method %></td>
+    <td><a href="<% request.uri_base %>/_show/name/<% mex.methods.$method.from %>"><% mex.methods.$method.from %></a></td>
+  </tr>
+  <% IF mex.methods.$method.code %>
+  <tr id="<% method %>_code_row" style="display:none">
+    <td colspan=3>
+      <pre><code class="language-perl"><% mex.methods.$method.code %></code></pre>
+    </td>
+  </tr>
+  <% END %>
+  <% END %>
+</table>
+<% END %>
+
+  <div id="footer">Powered by <a href="http://perldancer.org/">Dancer</a> <% dancer_version %></div>
+</div>
