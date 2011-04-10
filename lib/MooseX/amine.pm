@@ -277,6 +277,8 @@ sub extract_attribute_metainfo {
     $return->{meta}{$_}++ if $meta_attr->$_ ;
   }
 
+  ### FIXME should look at delegated methods and install exclusions for them
+
   return $return;
 
 }
