@@ -6,6 +6,7 @@ use Moose::Meta::Class;
 use Moose::Meta::Role;
 use Moose::Util::TypeConstraints;
 
+use autodie qw(open close);
 use Modern::Perl;
 use PPI;
 use Test::Deep::NoTest qw/eq_deeply/;
@@ -101,13 +102,43 @@ sub BUILDARGS {
 
   my $args = _convert_to_hashref_if_needed( @_ );
 
-  eval "require $args->{module};";
-  die $@ if $@;
+  if ( $args->{module}) {
+    eval "require $args->{module};";
+    die $@ if $@;
 
-  my $path = $args->{module} . '.pm';
-  $path =~ s|::|/|g;
-  $args->{path} = $INC{$path};
+    my $path = $args->{module} . '.pm';
+    $path =~ s|::|/|g;
+    $args->{path} = $INC{$path};
+  }
+  elsif ( $args->{path} ) {
+    open( my $IN , '<' , $args->{path} );
+    while (<$IN>) {
+      if ( /^package ([^;]+);/ ) {
+        my $module = $1;
 
+        my $path = $args->{path};
+        $path =~ s/.pm$//;
+        my @path_parts   = split '/'  , $path;
+        my @module_parts = split /::/ , $module;
+        my @inc_path     = ();
+
+        while ( @path_parts ) {
+          my $path = join '/' , @path_parts;
+          my $mod  = join '/' , @module_parts;
+          last if $path eq $mod;
+          push @inc_path , shift @path_parts;
+        }
+
+        my $inc_path = join '/' , @inc_path;
+
+        eval "use lib '$inc_path'; require $module";
+        die $@ if $@;
+        $args->{module} = $module;
+        last;
+      }
+    }
+    close( $IN );
+  }
   return $args;
 }
 
