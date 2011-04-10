@@ -24,8 +24,10 @@ my $expected_data_structure = {
     }
   },
   methods => {
-    base_method => { from => 'Test::Override::Object' },
-    test_method => { from => 'Test::Override::Object' }
+    base_method => { from => 'Test::Override::Object' ,
+                     code => qq|sub base_method { return 'this is a test' }| , },
+    test_method => { from => 'Test::Override::Object' ,
+                     code => qq|sub test_method { return 'this is a test' }| , }
   }
 };
 is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine()' );

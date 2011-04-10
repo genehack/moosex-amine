@@ -50,6 +50,9 @@ my $expected_data_structure = {
     new                => { from => 'Test::Basic::Object' },
   } ,
 };
-is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine()' );
+
+my $examine = $mex->examine;
+delete $examine->{methods}{$_}{code} foreach ( keys %{ $examine->{methods} } );
+is_deeply( $examine , $expected_data_structure , 'see expected output from examine()' );
 
 done_testing();

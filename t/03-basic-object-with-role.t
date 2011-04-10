@@ -32,9 +32,11 @@ my $expected_data_structure = {
   methods => {
     role_method => {
       from => 'Test::Basic::Role' ,
+      code => qq|sub role_method  { return 'role' }| ,
     } ,
     simple_method => {
       from => 'Test::Basic::ObjectWithRole' ,
+      code => qq|sub simple_method  { return 'simple' }| ,
     } ,
   } ,
 };

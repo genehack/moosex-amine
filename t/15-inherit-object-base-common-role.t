@@ -41,10 +41,14 @@ my $expected_data_structure = {
     } ,
   },
   methods => {
-    base_method         => { from => 'Test::Inheritance::BaseWithCommonRole' },
-    test_method         => { from => 'Test::Inheritance::ObjectWithCommonRole' } ,
-    role_method         => { from => 'Test::Basic::Role' } ,
-    common_role_method  => { from => 'Test::Inheritance::CommonRole' } ,
+    base_method         => { from => 'Test::Inheritance::BaseWithCommonRole' ,
+                             code => qq|sub base_method  { return 'this is a test from the base' }| , } ,
+    test_method         => { from => 'Test::Inheritance::ObjectWithCommonRole' ,
+                             code => qq|sub test_method { return 'this is a test' }| , } ,
+    role_method         => { from => 'Test::Basic::Role' ,
+                             code => qq|sub role_method  { return 'role' }| , } ,
+    common_role_method  => { from => 'Test::Inheritance::CommonRole' ,
+                             code => qq|sub common_role_method { return 'this is the role' }| , } ,
   }
 };
 is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine()' );

@@ -24,6 +24,7 @@ my $expected_data_structure = {
   methods => {
     role_method => {
       from => 'Test::Basic::ObjectOverridingRole' ,
+      code => qq|sub role_method  { return 'override' }| ,
     } ,
   } ,
 };

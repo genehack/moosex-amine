@@ -25,6 +25,7 @@ my $expected_data_structure = {
   methods => {
     role_method => {
       from => 'Test::Basic::Role' ,
+      code => qq|sub role_method  { return 'role' }| ,
     } ,
   } ,
 };

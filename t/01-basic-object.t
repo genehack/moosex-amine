@@ -23,6 +23,7 @@ my $expected_data_structure = {
   methods => {
     simple_method => {
       from => 'Test::Basic::Object' ,
+      code => qq|sub simple_method   { return 'simple' }| ,
     } ,
   } ,
 };

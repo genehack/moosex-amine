@@ -7,6 +7,7 @@ use Moose::Meta::Role;
 use Moose::Util::TypeConstraints;
 
 use Modern::Perl;
+use PPI;
 use Test::Deep::NoTest qw/eq_deeply/;
 use Try::Tiny;
 
@@ -85,6 +86,16 @@ has 'methods' => (
   },
 );
 
+has 'sub_nodes' => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  traits  => [ 'Hash' ] ,
+  handles => {
+    get_sub_node   => 'get' ,
+    store_sub_node => 'set' ,
+  },
+);
+
 sub BUILDARGS {
   my $class = shift;
 
@@ -147,6 +158,8 @@ sub dissect_class {
   foreach my $method ( $meta->get_method_list ) {
     $self->dissect_method( $meta , $method );
   }
+
+  $self->extract_sub_nodes( $meta->name );
 }
 
 sub dissect_method {
@@ -179,6 +192,10 @@ sub dissect_role {
   map { $self->dissect_attribute( $meta , $_ ) } $meta->get_attribute_list;
   map { $self->dissect_method( $meta , $_ )    } $meta->get_method_list;
 
+  my @names = split '\|' , $meta->name;
+  foreach my $name ( @names ) {
+    $self->extract_sub_nodes( $name );
+  }
 }
 
 sub examine {
@@ -193,6 +210,10 @@ sub examine {
       if ( $class =~ /^Moose::/) { next unless $self->include_moose_in_isa }
       $self->dissect_class( $class );
     }
+  }
+
+  foreach ( keys %{ $self->{methods} } ) {
+    $self->{methods}{$_}{code} = $self->get_sub_node( $_ );
   }
 
   return {
@@ -235,6 +256,26 @@ sub extract_method_metainfo {
   return {
     from => $meta_method->original_package_name ,
   };
+}
+
+sub extract_sub_nodes {
+  my( $self , $name ) = @_;
+
+  my $path = $name . '.pm';
+  $path =~ s|::|/|g;
+  $path = $INC{$path};
+
+  my $ppi = PPI::Document->new( $path )
+    or die "Can't load PPI for $path ($!)";
+
+  my $sub_nodes = $ppi->find(
+    sub{ $_[1]->isa( 'PPI::Statement::Sub' ) && $_[1]->name }
+  );
+
+  foreach my $sub_node ( @$sub_nodes ) {
+    my $name = $sub_node->name;
+    $self->store_sub_node( $name => $sub_node->content );
+  }
 }
 
 sub _compare_attrs {
