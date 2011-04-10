@@ -26,6 +26,35 @@ sub _build_metaobj {
 has 'module' => ( is => 'ro' , isa => 'Str' );
 has 'path'   => ( is => 'ro' , isa => 'Str' );
 
+has 'attributes' => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  traits  => [ 'Hash' ] ,
+  handles => {
+    get_attribute              => 'get' ,
+    store_attribute            => 'set' ,
+    check_for_stored_attribute => 'exists' ,
+  },
+);
+
+has 'exclusions' => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  handles => {
+    add_exclusion   => sub { my( $self , $ex ) = @_; $self->{exclusions}{$ex}++ } ,
+    check_exclusion => sub { my( $self , $ex ) = @_; return $self->{exclusions}{$ex} } ,
+  }
+);
+
+has 'methods' => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  traits  => [ 'Hash' ] ,
+  handles => {
+    store_method => 'set' ,
+  },
+);
+
 sub BUILDARGS {
   my $class = shift;
 
@@ -41,103 +70,108 @@ sub BUILDARGS {
   return $args;
 }
 
-sub examine {
-  my $self = shift;
-  my $meta = $self->metaobj;
+sub dissect_attribute {
+  my( $self , $meta , $attribute_name ) = @_;
 
-  my %return;
-
-  if ( $meta->can( 'roles' )) {
-    foreach my $role ( @{ $meta->roles } ) {
-      foreach my $attr( $role->get_attribute_list ) {
-        my $meta_attr = $role->get_attribute( $attr );
-        $return{attrs}{$attr} = _dissect_attr( $meta_attr );
-      }
-    }
-  }
-
-  foreach my $attr ( $meta->get_attribute_list ) {
-    my $meta_attr = $meta->get_attribute( $attr );
-
-    my $dissected_attr = _dissect_attr( $meta_attr );
-
-    $return{attrs}{$attr} = ( $return{attrs}{$attr} ) ?
-      _compare_attrs( $dissected_attr , $return{attrs}{$attr} ) : $dissected_attr;
-  }
-
-  foreach my $method ( $meta->get_method_list ) {
-    my $meta_method = $meta->get_method( $method );
-    my $src = $meta_method->original_package_name;
-
-    ### FIXME this should be controlled by a flag
-    next if $src =~ /^Moose/;
-
-    ### FIXME this should also be a config option, i guess...
-    next if _check_exclude( $method );
-
-    ### FIXME this should be controlled by a flag too
-    my @stock = qw/ DESTROY meta new /;
-    next if $method ~~ @stock;
-
-    $return{methods}{$method} = _dissect_method( $meta_method );
-  }
-
-  return \%return;
-}
-
-{
-  my $excludes;
-  sub _add_exclusion { my $name = shift; $excludes->{$name}++ }
-  sub _check_exclude { my $name = shift; return $excludes->{$name} }
-}
-
-sub _compare_attrs {
-  my( $new_attr , $old_attr ) = @_;
-
-  my $new_from = delete $new_attr->{from};
-  my $old_from = delete $old_attr->{from};
-
-  if ( eq_deeply( $new_attr , $old_attr )) {
-    $old_attr->{from} = $old_from;
-    return $old_attr;
-  }
-  else {
-    $new_attr->{from} = $new_from;
-    return $new_attr;
-  }
-}
-
-sub _convert_to_hashref_if_needed {
-  my( @list_of_args ) = @_;
-
-  return $_[0] if ref $_[0];
-
-  return { module => $_[0] } if @_ == 1;
-
-  my %hash = @_;
-  return \%hash;
-}
-
-sub _dissect_attr {
-  my $meta_attr = shift;
+  my $meta_attr = $meta->get_attribute( $attribute_name );
 
   my $return;
   given ( ref $meta_attr ) {
     when( 'Moose::Meta::Attribute' ) {
-      $return = { from => $meta_attr->associated_class->name };
+      $return = $meta_attr->associated_class->name;
     }
     when( 'Moose::Meta::Role::Attribute' ) {
-      $return = { from => $meta_attr->original_role->name };
+      $return = $meta_attr->original_role->name;
+      $meta_attr = $meta_attr->attribute_for_class();
     }
     default { die "can't handle $_" }
   }
 
-  $meta_attr = $meta_attr->attribute_for_class()
-    if ( $meta_attr->isa( 'Moose::Meta::Role::Attribute' ));
+  my $extracted_attribute = $self->extract_attribute_metainfo( $meta_attr );
+  $extracted_attribute->{from} = $return;
+
+  if ( $self->check_for_stored_attribute( $attribute_name )) {
+    $extracted_attribute = _compare_attrs(
+      $extracted_attribute , $self->get_attribute( $attribute_name )
+    );
+  }
+
+  $self->store_attribute( $attribute_name => $extracted_attribute );
+}
+
+sub dissect_class {
+  my( $self , $class ) = @_;
+  my $meta = $class->meta;
+
+  if ( $meta->can( 'roles' )) {
+    foreach my $role ( @{ $meta->roles } ) {
+      $self->dissect_role( $role );
+    }
+  }
+
+  foreach my $attr ( $meta->get_attribute_list ) {
+    $self->dissect_attribute( $meta , $attr );
+  }
+
+  foreach my $method ( $meta->get_method_list ) {
+    $self->dissect_method( $meta , $method );
+  }
+}
+
+sub dissect_method {
+  my( $self , $meta , $method_name ) = @_;
+
+  my $meta_method = $meta->get_method( $method_name );
+  my $src = $meta_method->original_package_name;
+
+  ### FIXME this should also be a config option, i guess...
+  return if $self->check_exclusion( $method_name );
+
+  ### FIXME this should be controlled by a flag too
+  my @stock = qw/ DESTROY meta new /;
+  return if $method_name ~~ @stock;
+
+  my $extracted_method =  $self->extract_method_metainfo( $meta_method );
+  $self->store_method( $method_name => $extracted_method );
+}
+
+sub dissect_role {
+  my( $self , $meta ) = @_;
+
+  map { $self->dissect_attribute( $meta , $_ ) } $meta->get_attribute_list;
+  map { $self->dissect_method( $meta , $_ )    } $meta->get_method_list;
+
+}
+
+sub examine {
+  my $self = shift;
+  my $meta = $self->metaobj;
+
+  if ( $meta->isa( 'Moose::Meta::Role' )) {
+    $self->dissect_role( $meta );
+  }
+  else {
+    foreach my $class ( $meta->linearized_isa ) {
+      # FIXME should be a config option
+      next if $class =~ /^Moose/;
+      $self->dissect_class( $class );
+    }
+  }
+
+  return {
+    attrs   => $self->{attributes} ,
+    methods => $self->{methods} ,
+  }
+}
+
+sub extract_attribute_metainfo {
+  my( $self , $meta_attr ) = @_;
+
+  my $return = {};
 
   foreach ( qw/ reader writer accessor / ) {
     next unless my $fxn = $meta_attr->$_;
-    _add_exclusion( $fxn );
+    $self->add_exclusion( $fxn );
     $return->{$_} = $fxn;
   }
 
@@ -158,12 +192,38 @@ sub _dissect_attr {
 
 }
 
-sub _dissect_method {
-  my $meta_method = shift;
+sub extract_method_metainfo {
+  my( $self , $meta_method ) = @_;
 
   return {
     from => $meta_method->original_package_name ,
   };
+}
+
+sub _compare_attrs {
+  my( $new_attr , $old_attr ) = @_;
+
+  my $new_from = delete $new_attr->{from};
+  my $old_from = delete $old_attr->{from};
+
+  if ( eq_deeply( $new_attr , $old_attr )) {
+    $old_attr->{from} = $old_from;
+    return $old_attr;
+  } else {
+    $new_attr->{from} = $new_from;
+    return $new_attr;
+  }
+}
+
+sub _convert_to_hashref_if_needed {
+  my( @list_of_args ) = @_;
+
+  return $_[0] if ref $_[0];
+
+  return { module => $_[0] } if @_ == 1;
+
+  my %hash = @_;
+  return \%hash;
 }
 
 __PACKAGE__->meta->make_immutable;
