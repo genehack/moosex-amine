@@ -7,6 +7,7 @@ use Moose::Meta::Role;
 use Moose::Util::TypeConstraints;
 
 use Modern::Perl;
+use Test::Deep::NoTest qw/eq_deeply/;
 use Try::Tiny;
 
 has 'metaobj' => (
@@ -46,9 +47,22 @@ sub examine {
 
   my %return;
 
+  if ( $meta->can( 'roles' )) {
+    foreach my $role ( @{ $meta->roles } ) {
+      foreach my $attr( $role->get_attribute_list ) {
+        my $meta_attr = $role->get_attribute( $attr );
+        $return{attrs}{$attr} = _dissect_attr( $meta_attr );
+      }
+    }
+  }
+
   foreach my $attr ( $meta->get_attribute_list ) {
     my $meta_attr = $meta->get_attribute( $attr );
-    $return{attrs}{$attr} = _dissect_attr( $meta_attr );
+
+    my $dissected_attr = _dissect_attr( $meta_attr );
+
+    $return{attrs}{$attr} = ( $return{attrs}{$attr} ) ?
+      _compare_attrs( $dissected_attr , $return{attrs}{$attr} ) : $dissected_attr;
   }
 
   foreach my $method ( $meta->get_method_list ) {
@@ -75,6 +89,22 @@ sub examine {
   my $excludes;
   sub _add_exclusion { my $name = shift; $excludes->{$name}++ }
   sub _check_exclude { my $name = shift; return $excludes->{$name} }
+}
+
+sub _compare_attrs {
+  my( $new_attr , $old_attr ) = @_;
+
+  my $new_from = delete $new_attr->{from};
+  my $old_from = delete $old_attr->{from};
+
+  if ( eq_deeply( $new_attr , $old_attr )) {
+    $old_attr->{from} = $old_from;
+    return $old_attr;
+  }
+  else {
+    $new_attr->{from} = $new_from;
+    return $new_from;
+  }
 }
 
 sub _convert_to_hashref_if_needed {
