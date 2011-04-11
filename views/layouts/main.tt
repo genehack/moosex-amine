@@ -3,29 +3,12 @@
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
     <title>MooseX::amine</title>
-<!--    <link rel="stylesheet" href="[% request.uri_base %]/css/style.css" /> -->
+    <link rel="stylesheet" href="<% request.uri_base %>/css/sh_vim-dark.css" />
+    <script src="<% request.uri_base %>/js/sh_main.min.js" type="text/javascript"></script>
+    <script src="<% request.uri_base %>/js/sh_perl.min.js" type="text/javascript"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
-    <script type=text/javascript
-            src=http://github.com/balupton/jquery-syntaxhighlighter/raw/master/scripts/jquery.syntaxhighlighter.min.js></script>
-    <script type=text/javascript>
-      $.SyntaxHighlighter.init({
-        theme: "google" ,
-        lineNumbers: false
-      });
-    </script>
-    <style>
-      code { font-family: Consolas,"Andale Mono",monospace; }
-code.prettyprint { border: 0px; }
-
-pre {
-    background: #eee;
-    padding: 10px;
-    border: 1px black solid;
-    font-family: Consolas,"Andale Mono",monospace;
-}
-    </style>
   </head>
-  <body>
+  <body onload="sh_highlightDocument();">
     <% content %>
   </body>
 </html>

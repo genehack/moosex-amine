@@ -23,7 +23,7 @@
   </tr>
   <tr id="<% attr %>_meta_row" style="display:none">
     <td colspan="5">
-      <pre><code class="language-perl"><% Dumper.dump( mex.attrs.$attr ) %></code></pre>
+      <pre class="sh_perl"><% Dumper.dump( mex.attrs.$attr ) %></pre>
     </td>
   </tr>
   <% END %>
@@ -41,7 +41,7 @@
   <% IF mex.methods.$method.code %>
   <tr id="<% method %>_code_row" style="display:none">
     <td colspan=3>
-      <pre><code class="language-perl"><% mex.methods.$method.code %></code></pre>
+      <pre class="sh_perl"><% mex.methods.$method.code %></pre>
     </td>
   </tr>
   <% END %>
