@@ -10,19 +10,19 @@
   <table border=1 cellpadding=5>
     <caption>Attributes</caption>
     <tr><td width="2px">&nbsp;</td><th>Name</th><th>Is</th><th>Isa</th><th>From</th></tr>
-    <% FOREACH attr IN mex.attrs.keys.sort %>
+    <% FOREACH attr IN mex.attributes.keys.sort %>
     <tr>
       <td><a href="#" onClick="$('#<% attr %>_meta_row').toggle();return false">X</a></td>
       <td>
         <% attr %>
       </td>
-      <td><% IF mex.attrs.$attr.writer OR mex.attrs.$attr.accessor %>rw<% ELSE %>ro<% END %></td>
-      <td><% mex.attrs.$attr.meta.constraint %></td>
-      <td><a href="<% request.uri_base %>/_show/name/<% mex.attrs.$attr.from %>"><% mex.attrs.$attr.from %></a></td>
+      <td><% IF mex.attributes.$attr.writer OR mex.attributes.$attr.accessor %>rw<% ELSE %>ro<% END %></td>
+      <td><% mex.attributes.$attr.meta.constraint %></td>
+      <td><a href="<% request.uri_base %>/_show/name/<% mex.attributes.$attr.from %>"><% mex.attributes.$attr.from %></a></td>
     </tr>
     <tr id="<% attr %>_meta_row" style="display:none">
       <td colspan="5">
-        <pre class="sh_perl"><% Dumper.dump( mex.attrs.$attr ) %></pre>
+        <pre class="sh_perl"><% Dumper.dump( mex.attributes.$attr ) %></pre>
       </td>
     </tr>
     <% END %>

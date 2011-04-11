@@ -1,5 +1,8 @@
 #! /opt/perl/bin/perl
 
+# ABSTRACT: Moose examinations (console)
+# PODNAME: mex
+
 use List::Util qw/ max /;
 use Modern::Perl;
 use MooseX::amine;
@@ -19,9 +22,9 @@ my $mex = MooseX::amine->new( $module );
 
 my $data = $mex->examine;
 
-my $attribute_name_length = max_length( keys %{ $data->{attrs} });
-my $attribute_from_length = max_length( map { $data->{attrs}{$_}{from} } keys %{ $data->{attrs} } );
-my $attribute_isa_length  = max_length( map { $data->{attrs}{$_}{meta}{constraint} } keys %{ $data->{attrs} });
+my $attribute_name_length = max_length( keys %{ $data->{attributes} });
+my $attribute_from_length = max_length( map { $data->{attributes}{$_}{from} } keys %{ $data->{attributes} } );
+my $attribute_isa_length  = max_length( map { $data->{attributes}{$_}{meta}{constraint} } keys %{ $data->{attributes} });
 
 my $attribute_fstring = "%-${attribute_name_length}s  %2s   %-${attribute_isa_length}s  %-${attribute_from_length}s\n";
 
@@ -31,12 +34,12 @@ printf $attribute_fstring , 'NAME' , 'IS' , 'ISA' , 'FROM';
 printf $attribute_fstring , '-' x $attribute_name_length , '--' ,
   '-' x $attribute_isa_length , '-' x $attribute_from_length;
 
-foreach my $attribute ( sort keys %{ $data->{attrs} }) {
-  my $rw = ( $data->{attrs}{$attribute}{writer} or $data->{attrs}{$attribute}{accessor} )
+foreach my $attribute ( sort keys %{ $data->{attributes} }) {
+  my $rw = ( $data->{attributes}{$attribute}{writer} or $data->{attributes}{$attribute}{accessor} )
     ? 'rw' : 'ro';
 
   printf $attribute_fstring , $attribute , $rw ,
-    $data->{attrs}{$attribute}{meta}{constraint} , $data->{attrs}{$attribute}{from};
+    $data->{attributes}{$attribute}{meta}{constraint} , $data->{attributes}{$attribute}{from};
 }
 
 my $method_name_length = max_length( keys %{ $data->{methods} } );

@@ -15,10 +15,9 @@ my $mex = MooseX::amine->new({
 });
 
 isa_ok( $mex , 'MooseX::amine' );
-isa_ok( $mex->metaobj , 'Moose::Meta::Class' );
 
 my $expected_data_structure = {
-  attrs => {
+  attributes => {
     simple_attribute => {
       accessor => 'simple_attribute',
       from     => 'Test::Basic::Object',

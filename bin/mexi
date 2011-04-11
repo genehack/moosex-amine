@@ -1,5 +1,8 @@
 #! /opt/perl/bin/perl
 
+# ABSTRACT: Dancer-powered Moose examinations (interactive)
+# PODNAME: mexi
+
 use Dancer;
 use File::Find::Rule;
 use Hash::Merge qw/ merge /;
@@ -19,7 +22,10 @@ set warnings     => 1;
 
 layout 'main';
 
-our $VERSION = '0.1';
+my %standard_mooosex_amine_args = (
+  include_private_attributes => 1 ,
+  include_private_methods    => 1 ,
+);
 
 get '/_list' => sub {
   my @files = File::Find::Rule->file()->name('*.pm')->in('./');
@@ -40,30 +46,39 @@ get '/_list' => sub {
 
 get '/_show/name/*' => sub {
   my( $name ) = splat;
-  debug $name;
 
   try {
-    my $mex = MooseX::amine->new( $name );
-    template 'show' => { mex => $mex->examine , name => $name };
+    my $mex = MooseX::amine->new({
+      module => $name ,
+      %standard_mooosex_amine_args ,
+    });
+    template 'show' => {
+      mex  => $mex->examine ,
+      name => $name
+    };
   }
   catch { debug $name };
 
 };
 
 get qr{^/_show/(.*)} => sub {
-  if ( my( $file ) = splat ) {
-    debug $file;
-    try {
-      my $mex = MooseX::amine->new({ path => $file });
-      template 'show' => { mex => $mex->examine , name => $mex->metaobj->name };
-    }
-    catch {
-      if ($_ =~ /^Can't locate object method "meta" via package/ ) {
-        template 'show' => { no_mex =>1 , message => 'Not a Moose object' };
-      }
-      else { die $_ }
-    };
+  my( $file ) = splat;
+
+  try {
+    my $mex = MooseX::amine->new({
+      path => $file ,
+      %standard_mooosex_amine_args ,
+    });
+    template 'show' => {
+      mex  => $mex->examine ,
+      name => $mex->module };
   }
+  catch {
+    if ($_ =~ /^Can't locate object method "meta" via package/ ) {
+      template 'show' => { no_mex =>1 , message => 'Not a Moose object' };
+    }
+    else { die $_ }
+  };
 };
 
 get '/_show' => sub {

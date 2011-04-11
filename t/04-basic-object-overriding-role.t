@@ -8,10 +8,9 @@ use lib './t/lib';
 my $mex = MooseX::amine->new( 'Test::Basic::ObjectOverridingRole' );
 
 isa_ok( $mex , 'MooseX::amine' );
-isa_ok( $mex->metaobj , 'Moose::Meta::Class' );
 
 my $expected_data_structure = {
-  attrs => {
+  attributes => {
     role_attribute => {
       accessor => 'role_attribute',
       from     => 'Test::Basic::ObjectOverridingRole',

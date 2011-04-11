@@ -8,10 +8,9 @@ use lib './t/lib';
 my $mex = MooseX::amine->new( 'Test::Inheritance::Object' );
 
 isa_ok( $mex , 'MooseX::amine' );
-isa_ok( $mex->metaobj , 'Moose::Meta::Class' );
 
 my $expected_data_structure = {
-  attrs   => {
+  attributes   => {
     base_attribute   => {
       from   => 'Test::Inheritance::Base',
       meta   => { constraint => 'Str' },

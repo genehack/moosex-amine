@@ -8,10 +8,9 @@ use lib './t/lib';
 my $mex = MooseX::amine->new( 'Test::Override::ObjectWithRole' );
 
 isa_ok( $mex , 'MooseX::amine' );
-isa_ok( $mex->metaobj , 'Moose::Meta::Class' );
 
 my $expected_data_structure = {
-  attrs   => {
+  attributes   => {
     base_attribute   => {
       from     => 'Test::Override::ObjectWithRole',
       meta     => { constraint => 'Str' },
