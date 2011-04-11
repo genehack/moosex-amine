@@ -5,19 +5,27 @@
 
 use Dancer;
 use File::Find::Rule;
+use File::ShareDir qw/ dist_dir /;
 use Hash::Merge qw/ merge /;
 use Modern::Perl;
 use MooseX::amine;
 use Template;
 use Try::Tiny;
 
+my $dir    = dist_dir('MooseX-amine');
+my $public = "$dir/public";
+my $views  = "$dir/views";
+
+set access_log   => 1;
+set appdir       => $dir;
 set appname      => 'MooseX::amine';
 set charset      => "UTF-8";
-set template     => "template_toolkit";
-set logger       => 'console';
 set log          => 'core';
+set logger       => 'console';
+set public       => $public;
 set show_errors  => 1 ;
-set access_log   => 1;
+set template     => "template_toolkit";
+set views        => $views;
 set warnings     => 1;
 
 layout 'main';
