@@ -53,6 +53,7 @@ my %standard_mooosex_amine_args = (
 );
 
 get '/_list' => sub {
+  my $dir = File::Spec->rel2abs( './' );
   my @files = File::Find::Rule->file()->name('*.pm')->in('./');
 
   my %tree;
@@ -66,7 +67,7 @@ get '/_list' => sub {
     %tree = %{ merge( $hash , \%tree )  };
   }
 
-  template 'list' => { files => \@files  , tree => \%tree };
+  template 'list' => { files => \@files  , tree => \%tree , dir => $dir };
 };
 
 get '/_show/name/*' => sub {

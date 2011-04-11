@@ -1,3 +1,5 @@
+Browsing files in: <% dir %>
+
 <ul>
 <% FOREACH level IN tree.keys %>
 <% INCLUDE tree_level
