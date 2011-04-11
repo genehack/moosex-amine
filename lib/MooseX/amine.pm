@@ -397,20 +397,24 @@ sub _extract_sub_nodes {
 
   my $path = $name . '.pm';
   $path =~ s|::|/|g;
-  $path = $INC{$path};
+  if ( $path = $INC{$path} ){
+    try {
+      my $ppi = PPI::Document->new( $path )
+        or die "Can't load PPI for $path ($!)";
 
-  my $ppi = PPI::Document->new( $path )
-    or die "Can't load PPI for $path ($!)";
+      my $sub_nodes = $ppi->find(
+        sub{ $_[1]->isa( 'PPI::Statement::Sub' ) && $_[1]->name }
+      );
 
-  my $sub_nodes = $ppi->find(
-    sub{ $_[1]->isa( 'PPI::Statement::Sub' ) && $_[1]->name }
-  );
-
-  foreach my $sub_node ( @$sub_nodes ) {
-    my $name = $sub_node->name;
-    $self->_store_sub_node( $name => $sub_node->content );
+      foreach my $sub_node ( @$sub_nodes ) {
+        my $name = $sub_node->name;
+        $self->_store_sub_node( $name => $sub_node->content );
+      }
+    };
+    # FIXME should probably do something about errors here...
   }
 }
+
 
 # given a module name and a path to that module, dynamically load the
 # module. figures out the appropriate 'use lib' statement based on the path.
