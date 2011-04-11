@@ -344,6 +344,7 @@ sub _dissect_role {
 
   my @names = split '\|' , $meta->name;
   foreach my $name ( @names ) {
+    next if $name =~ /Moose::Meta::Role::__ANON/;
     $self->_extract_sub_nodes( $name );
   }
 }
