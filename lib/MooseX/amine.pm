@@ -431,6 +431,12 @@ sub _load_module_from_path {
   return $module;
 }
 
+=head1 CREDITS
+
+Semi-inspired by L<MooseX::Documenter>.
+
+=cut
+
 #__PACKAGE__->meta->make_immutable;
 1;
 
