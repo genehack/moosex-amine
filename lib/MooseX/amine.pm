@@ -437,7 +437,13 @@ sub _load_module_from_path {
 
 =head1 CREDITS
 
-Semi-inspired by L<MooseX::Documenter>.
+=over 4
+
+=item Semi-inspired by L<MooseX::Documenter>.
+
+=item Syntax highlighting Javascript/CSS stuff based on SHJS and largely stolen from search.cpan.org.
+
+=back
 
 =cut
 
