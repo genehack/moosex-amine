@@ -22,6 +22,7 @@ roles, and classes? Worried about grues? Maybe C<mexi> can help.
 use Dancer;
 use File::Find::Rule;
 use File::ShareDir qw/ dist_dir /;
+use File::Spec;
 use Hash::Merge qw/ merge /;
 use Modern::Perl;
 use MooseX::amine;
@@ -29,8 +30,8 @@ use Template;
 use Try::Tiny;
 
 my $dir    = dist_dir('MooseX-amine');
-my $public = "$dir/public";
-my $views  = "$dir/views";
+my $public = ( -e './share/public') ? File::Spec->rel2abs('./share/public') : "$dir/public";
+my $views  = ( -e './share/views' ) ? File::Spec->rel2abs('./share/views')  : "$dir/views";
 
 set access_log   => 1;
 set appdir       => $dir;
