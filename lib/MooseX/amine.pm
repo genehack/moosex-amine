@@ -12,6 +12,10 @@ use PPI;
 use Test::Deep::NoTest qw/eq_deeply/;
 use Try::Tiny;
 
+=head1 WARNING
+
+Depends on Moose-1.99* features -- will blow up with older Moosen...
+
 =head1 SYNOPSIS
 
     my $mex  = MooseX::amine->new( 'MooseX::amine' );
