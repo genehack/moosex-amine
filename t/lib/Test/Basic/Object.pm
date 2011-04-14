@@ -1,6 +1,7 @@
 package Test::Basic::Object;
 use Moose;
 has 'simple_attribute'   => ( is => 'rw' , isa => 'Str' );
+has 'bare_ro_attribute'  => ( is => 'ro' );
 has '_private_attribute' => ( is => 'ro' , isa => 'Int' );
 sub simple_method   { return 'simple' }
 sub _private_method { return 'private' }

@@ -18,6 +18,10 @@ my $expected_data_structure = {
         constraint => 'Str' ,
       } ,
     } ,
+    bare_ro_attribute => {
+      reader => 'bare_ro_attribute',
+      from     => 'Test::Basic::Object',
+    } ,
   },
   methods => {
     simple_method => {

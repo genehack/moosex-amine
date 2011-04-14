@@ -25,6 +25,10 @@ my $expected_data_structure = {
         constraint => 'Str' ,
       } ,
     } ,
+    bare_ro_attribute => {
+      reader => 'bare_ro_attribute',
+      from   => 'Test::Basic::Object',
+    } ,
     _private_attribute => {
       reader => '_private_attribute' ,
       from   => 'Test::Basic::Object' ,
@@ -37,6 +41,7 @@ my $expected_data_structure = {
     _private_attribute => { from => 'Test::Basic::Object' } ,
     _private_method    => { from => 'Test::Basic::Object' } ,
     simple_attribute   => { from => 'Test::Basic::Object' },
+    bare_ro_attribute  => { from => 'Test::Basic::Object' },
     simple_method      => { from => 'Test::Basic::Object' } ,
     BUILDALL           => { from => 'Moose::Object' },
     BUILDARGS          => { from => 'Moose::Object' },
