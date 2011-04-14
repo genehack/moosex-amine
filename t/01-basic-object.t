@@ -22,6 +22,14 @@ my $expected_data_structure = {
       reader => 'bare_ro_attribute',
       from   => 'Test::Basic::Object',
     } ,
+    hash_trait => {
+      accessor => 'hash_trait',
+      from     => 'Test::Basic::Object',
+      meta     => {
+        constraint => 'HashRef' ,
+        traits     => [ 'Moose::Meta::Attribute::Native::Trait::Hash' ] ,
+      },
+    },
   },
   methods => {
     simple_method => {

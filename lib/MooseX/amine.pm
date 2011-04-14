@@ -364,6 +364,9 @@ sub _extract_attribute_metainfo {
   $return->{meta}{constraint} = $meta_attr->type_constraint->name
     if ( $meta_attr->has_type_constraint );
 
+  $return->{meta}{traits} = $meta_attr->applied_traits
+    if ( $meta_attr->has_applied_traits );
+
   foreach ( qw/
                 is_weak_ref is_required is_lazy is_lazy_build should_coerce
                 should_auto_deref has_trigger has_handles
