@@ -15,7 +15,7 @@ Browsing files in: <% dir %>
   <li>
     <a href="#" onclick="$('#tree_level_<% tracking_level %>').toggle();return false"><% level %></a>
     <ul id="tree_level_<% tracking_level %>" style="display:none;indent-left:4px;padding-left:4px">
-      <% FOREACH level IN tree.keys %>
+      <% FOREACH level IN tree.keys.sort %>
       <% INCLUDE tree_level
          level = level
          tree = tree.$level
