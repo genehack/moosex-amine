@@ -35,7 +35,13 @@ eval 'use IO::Page';
 my $module = shift
   or die "Need a module to examine!";
 
-my $mex = MooseX::amine->new( $module );
+my $mex;
+if (-e $module ) {
+  $mex = MooseX::amine->new({ path => $module });
+}
+else {
+  $mex = MooseX::amine->new( $module );
+}
 
 my $data = $mex->examine;
 
