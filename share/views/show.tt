@@ -17,7 +17,7 @@
         <% attr %>
       </td>
       <td><% IF mex.attributes.$attr.writer OR mex.attributes.$attr.accessor %>rw<% ELSE %>ro<% END %></td>
-      <td><% mex.attributes.$attr.meta.constraint %></td>
+      <td><% mex.attributes.$attr.meta.constraint OR '&nbsp;' %></td>
       <td><a href="<% request.uri_base %>/_show/name/<% mex.attributes.$attr.from %>"><% mex.attributes.$attr.from %></a></td>
     </tr>
     <tr id="<% attr %>_meta_row" style="display:none">

@@ -41,7 +41,7 @@ my $data = $mex->examine;
 
 my $attribute_name_length = max_length( keys %{ $data->{attributes} });
 my $attribute_from_length = max_length( map { $data->{attributes}{$_}{from} } keys %{ $data->{attributes} } );
-my $attribute_isa_length  = max_length( map { $data->{attributes}{$_}{meta}{constraint} } keys %{ $data->{attributes} });
+my $attribute_isa_length  = max_length( map { $data->{attributes}{$_}{meta}{constraint} || 0 } keys %{ $data->{attributes} });
 
 my $attribute_fstring = "%-${attribute_name_length}s  %2s   %-${attribute_isa_length}s  %-${attribute_from_length}s\n";
 
@@ -56,7 +56,7 @@ foreach my $attribute ( sort keys %{ $data->{attributes} }) {
     ? 'rw' : 'ro';
 
   printf $attribute_fstring , $attribute , $rw ,
-    $data->{attributes}{$attribute}{meta}{constraint} , $data->{attributes}{$attribute}{from};
+    $data->{attributes}{$attribute}{meta}{constraint} || '' , $data->{attributes}{$attribute}{from};
 }
 
 my $method_name_length = max_length( keys %{ $data->{methods} } );
