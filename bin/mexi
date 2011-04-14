@@ -58,6 +58,7 @@ get '/_list' => sub {
 
   my %tree;
   foreach my $file ( @files  ) {
+    next if $file =~ /^\./;
     my @parts = split '/' , $file;
     my $hash = { pop @parts => $file };
     while ( my $part = pop @parts ) {
