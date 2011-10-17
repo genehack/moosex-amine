@@ -30,7 +30,7 @@ $ENV{LESS} = 'RF';
 
 # don't catch any errors here; if this fails we just output stuff like
 # normal and nobody is the wiser.
-eval 'use IO::Page';
+#eval 'use IO::Page';
 
 my $module = shift
   or die "Need a module to examine!";
