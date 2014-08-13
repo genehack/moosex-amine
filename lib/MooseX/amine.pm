@@ -105,7 +105,7 @@ has '_metaobj' => (
 sub _build_metaobj {
   my $self = shift;
   return $self->{module}->meta
-    or die "Can't get meta object for module!" ;
+    || die "Can't get meta object for module!" ;
 }
 
 has '_methods' => (
