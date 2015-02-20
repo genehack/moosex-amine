@@ -40,4 +40,10 @@ my $expected_data_structure = {
 };
 is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine()' );
 
+# Same but pass hash to constructor instead of ref
+$mex = MooseX::amine->new( path => './t/lib/Test/Basic/Object.pm' );
+
+isa_ok( $mex , 'MooseX::amine', 'Constructor from hash' );
+is_deeply( $mex->examine , $expected_data_structure , 'see expected output from examine() after build from hash' );
+
 done_testing();
