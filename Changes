@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.5       2015-03-01 21:03:52-08:00 America/Los_Angeles
+
         * Add Changes file (Pete Houston)
         * Update dist.ini for Kwalitee (Pete Houston)
         * Update tests to improve coverage (Pete Houston)
