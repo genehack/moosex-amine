@@ -22,9 +22,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MooseX-amine",
   "EXE_FILES" => [
+    "bin/mexi",
     "bin/list_methods_for_native_trait",
-    "bin/mex",
-    "bin/mexi"
+    "bin/mex"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
@@ -52,7 +52,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Moose::Role" => 0,
+    "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0,
+    "Test::Pod" => "1.41",
+    "Test::Pod::Coverage" => "1.08",
     "lib" => 0
   },
   "VERSION" => "0.4",
@@ -79,9 +82,12 @@ my %FallbackPrereqs = (
   "Moose::Role" => 0,
   "Moose::Util::TypeConstraints" => 0,
   "PPI" => 0,
+  "Pod::Coverage::TrustPod" => 0,
   "Template" => 0,
   "Test::Deep::NoTest" => 0,
   "Test::More" => 0,
+  "Test::Pod" => "1.41",
+  "Test::Pod::Coverage" => "1.08",
   "Try::Tiny" => 0,
   "autodie" => 0,
   "lib" => 0,
