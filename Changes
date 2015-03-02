@@ -2,8 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
-        * Add Changes file
-        * Update dist.ini for Kwalitee
+        * Add Changes file (Pete Houston)
+        * Update dist.ini for Kwalitee (Pete Houston)
+        * Update tests to improve coverage (Pete Houston)
 
 0.4 Tue Aug 12 23:23:06 2014 -0500
 
