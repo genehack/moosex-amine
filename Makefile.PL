@@ -55,6 +55,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08",
+    "Test::Trap" => 0,
     "lib" => 0
   },
   "VERSION" => "0.4",
@@ -87,6 +88,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Pod" => "1.41",
   "Test::Pod::Coverage" => "1.08",
+  "Test::Trap" => 0,
   "Try::Tiny" => 0,
   "autodie" => 0,
   "lib" => 0,
