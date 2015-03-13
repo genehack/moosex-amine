@@ -18,7 +18,7 @@ like( $trap->die, qr/Can't locate Foo.Bar.Baz\.pm in \@INC/,
 
 @r = trap { MooseX::amine->new({ path => 'foo/bar/baz.pm' }) };
 is( $trap->leaveby, 'die', 'Unfound path in constructor dies' );
-like( $trap->die, qr/No such file or directory/,
+like( $trap->die, qr/Can't open 'foo.bar.baz\.pm' for reading/,
   'Unfound path in constructor error message' );
 
 @r = trap { MooseX::amine->new({ path => './t/lib/Test/Bad/Foo.pm' }) };
